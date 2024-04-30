@@ -1,0 +1,23 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <title>Computer Science Revision Site</title>
+  </head>
+  <script>
+    function checkAnswer(id) {
+      fetch("https://")
+    }
+
+
+  </script>
+  <body style="background: rgba( 44, 45, 46 , 1.0 );">
+    <div style="text-align:center; display:flex; flex-direction:column; justify-content: center; gap:10px; margin: 0 auto; padding-top: 100px; max-width:50%;">
+      <h2 style="color: #FFFFFF;">{{ question.name }}</h3>
+      {% for option in question.options %}
+        <input id="{{ loop.index }}" type="button" style="height: 40px" value="{{ option }}"/>
+      {% endfor %}  
+      
+      <input type="button" style="height: 40px" value="Next Question" onClick="window.location.reload();"/>
+    </div>
+  </body>
+</html> 
