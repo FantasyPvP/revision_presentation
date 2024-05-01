@@ -14,19 +14,14 @@ use std::io::Write;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Question {
-    id: u32
+    id: usize,
     name: String,
     options: Vec<String>,
-    answer: u32,
+    answer: usize,
 }
 
 #[get("/")]
 fn index() -> Template {
-    Template::render("index", context! {})
-}
-
-#[get("/question")]
-fn question() -> Template {
     let mut rng = rand::thread_rng();
 
     let filestring = fs::read_to_string("questions.json").unwrap();
@@ -39,6 +34,16 @@ fn question() -> Template {
     Template::render("question", context! { question })
 }
 
+#[get("/check/<question_id>/<response_id>")]
+fn check_ans(question_id: usize, response_id: usize) -> Json<bool> {
+    let filestring = fs::read_to_string("questions.json").unwrap();
+    let questions: Vec<Question> =
+        serde_json::from_str(&filestring).expect("Unable to parse JSON file");
+
+    let question = questions[question_id].clone();
+    Json(question.answer == response_id)
+}
+
 #[get("/writeq")]
 fn writeq() -> &'static str {
     let filestring = fs::read_to_string("questions.json").unwrap();
@@ -46,7 +51,7 @@ fn writeq() -> &'static str {
         serde_json::from_str(&filestring).expect("Unable to parse JSON file");
 
     questions.push(Question {
-        idx: questions.len(),
+        id: questions.len(),
         name: String::from("test question 1"),
         options: vec!["answer 1".to_string(), "answer 2".to_string()],
         answer: 0,
@@ -60,6 +65,6 @@ fn writeq() -> &'static str {
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, question, writeq])
+        .mount("/", routes![index, check_ans])
         .attach(Template::fairing())
 }

@@ -4,17 +4,26 @@
     <title>Computer Science Revision Site</title>
   </head>
   <script>
-    function checkAnswer(id) {
-      fetch("https://")
+    async function checkAnswer(question_id, response_id) {
+      const response = await fetch("http://localhost:8000/check/" + question_id + "/" + (response_id-1) ); // sub 1 since loops in tera are 1-indexed
+        
+      var selected = document.getElementById(response_id);
+      if (await response.json()) {        
+        selected.style.backgroundColor = 'green';
+        var title = document.getElementById('question');
+        title.innerHTML = title.innerHTML + "   ✅"
+      } else {
+        selected.style.backgroundColor = 'red';
+      }
     }
 
 
   </script>
   <body style="background: rgba( 44, 45, 46 , 1.0 );">
     <div style="text-align:center; display:flex; flex-direction:column; justify-content: center; gap:10px; margin: 0 auto; padding-top: 100px; max-width:50%;">
-      <h2 style="color: #FFFFFF;">{{ question.name }}</h3>
+      <h2 id="question" style="color: #FFFFFF;">{{ question.name }}</h3>
       {% for option in question.options %}
-        <input id="{{ loop.index }}" type="button" style="height: 40px" value="{{ option }}"/>
+        <input id="{{ loop.index }}" type="button" style="height: 40px" value="{{ option }}" onClick="checkAnswer({{ question.id }}, {{ loop.index }})"/>
       {% endfor %}  
       
       <input type="button" style="height: 40px" value="Next Question" onClick="window.location.reload();"/>
